@@ -1,0 +1,21 @@
+[submodule "Window"]
+	path = Window
+	url = git@github.com:Pangi790927/Window.git
+[submodule "Mesh"]
+	path = Mesh
+	url = git@github.com:Pangi790927/Mesh.git
+[submodule "Misc"]
+	path = Misc
+	url = git@github.com:Pangi790927/Misc.git
+[submodule "Shaders"]
+	path = Shaders
+	url = git@github.com:Pangi790927/Shaders.git
+[submodule "Texture"]
+	path = Texture
+	url = git@github.com:Pangi790927/Texture.git
+[submodule "Math4f"]
+	path = Math4f
+	url = git@github.com:Pangi790927/Math4f.git
+[submodule "Game"]
+	path = Game
+	url = git@github.com:Pangi790927/Game.git
