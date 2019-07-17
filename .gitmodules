@@ -19,3 +19,6 @@
 [submodule "Game"]
 	path = Game
 	url = git@github.com:Pangi790927/Game.git
+[submodule "Procedural"]
+	path = Procedural
+	url = git@github.com:Pangi790927/Procedural.git
