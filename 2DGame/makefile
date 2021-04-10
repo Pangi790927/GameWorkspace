@@ -7,7 +7,7 @@ ifeq ($(OS),Windows_NT)
 	GLEW = glew.o
 else
 	NAME = test
-	CXX = g++-7
+	CXX = g++
 	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -o $(NAME)
 	RM = rm -rf
 	GLEW = 

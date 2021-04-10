@@ -15,7 +15,8 @@ struct VertexColor		{ constexpr const static char name[] = "color"; };
 
 #include "DrawContext.h"
 #include "GameUtil.h"
-#include "GameMap.h"
+#include "pathfinding.h"
+#include "camera.h"
 
 using NormalVertexType = Vertex<
 	Math::Point3f,	VertexPosition,
@@ -32,8 +33,8 @@ int main (int argc, char const *argv[])
 
 	/// Shader
 	ShaderProgram shader = ShaderProgram({
-		{GL_VERTEX_SHADER, "Shaders/textureShader.vert"},
-		{GL_FRAGMENT_SHADER, "Shaders/textureShader.frag"}
+		{GL_VERTEX_SHADER, "Shaders/mapShader.vert"},
+		{GL_FRAGMENT_SHADER, "Shaders/mapShader.frag"}
 	});
 
 	/// Draw Context
@@ -61,19 +62,10 @@ int main (int argc, char const *argv[])
 	// glEnable(GL_BLEND);
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Mesh<NormalVertexType> square1;
-	Mesh<NormalVertexType> square2;
-	Mesh<NormalVertexType> circle;
-
-	Util::addSquare(square1, 0.3, Vec4f(0.34, 0.56, 0.1, 1));
-	Util::addSquare(square2, 0.3, Vec4f(0.74, 0.23, 0.56, 1));
-	Util::addCircle(circle, 0.01, 30, Vec4f(0.12, 0.23, 0.42, 1));
-
-	DeprecatedVBOMeshDraw gSquare1(square1);
-	DeprecatedVBOMeshDraw gSquare2(square2);
-	DeprecatedVBOMeshDraw gCircle(circle);
-
-	GameMap map(10, 10);
+	bool wasLmb = false;
+	GameMap map("map.json");
+	// auto grid = load_grid("map.txt");
+	Camera camera;
 
 	while (window.active) {
 		/// EXIT KEY:
@@ -82,39 +74,72 @@ int main (int argc, char const *argv[])
 				window.requestClose();
 		}
 		// newGame.getInput(window, drawContext);
+		camera.getInput(window);
 		window.mouse.update();
 		
 		window.focus();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glLineWidth(1);
-		glLineWidth(4);
 
 		shader.setMatrix("projectionMatrix", identity<4, float>());
 		shader.setMatrix("viewMatrix", identity<4, float>());
-		shader.setMatrix("worldMatrix", identity<4, float>());
+		shader.setMatrix("worldMatrix",
+				translation<float>(-camera.pos.x, -camera.pos.y, 0));
+
+		map.draw(camera.pos);
+
+		static int sleep_reset = 0;
+		static std::vector<Math::Point2i> to_animate;
+		static std::vector<Math::Point2i> path;
+		static std::vector<std::vector<Math::Point2i>> update_order;
+		static int animate_inc = 0;
+		static int path_inc = 0;
+		static int sleep_timer = sleep_reset;
+
+		sleep_timer--;
+		if (sleep_timer <= 0) {
+			sleep_timer = sleep_reset;
+			animate_inc++;
+			if (animate_inc >= to_animate.size())
+				path_inc++;
+		}
+		if (animate_inc > to_animate.size())
+			animate_inc = to_animate.size();
+		if (path_inc > path.size())
+			path_inc = path.size();
+
+		for (int i = 0; i < animate_inc; i++) {
+			draw_wall(to_animate[i].x, to_animate[i].y, SIDE, CYAN);
+		}
+		glLineWidth(2);
+		for (int i = 0; i < path_inc; i++) {
+			draw_wall(path[i].x, path[i].y, SIDE, GREEN);
+		}
+		glLineWidth(1);
+		if (animate_inc != 0)
+			draw_cross(to_animate[animate_inc - 1].x,
+					to_animate[animate_inc - 1].y, SIDE, RED);
+		if (animate_inc != 0)
+			for (auto elem : update_order[animate_inc - 1])
+				draw_circle(elem.x, elem.y, SIDE, RED);
 
 		// still needs to go:
 		Point2f mousePos = Util::getMousePos(window.mouse,
 				window.width, window.height);
 		static Point2f mouseStart = 0;
-		if (window.mouse.getOnceRmb()) {
+		if (window.mouse.getOnceLmb()) {
 			mouseStart = mousePos;
 		}
-
-		gCircle.draw(shader);
-		gSquare1.draw(shader);
-		gSquare2.draw(shader);
-
-		map.draw(drawContext);
 
 		shader.setMatrix("projectionMatrix", identity<4, float>());
 		shader.setMatrix("viewMatrix", identity<4, float>());		
 
-		if (window.mouse.getRmb()) {
+		if (window.mouse.getLmb()) {
+			wasLmb = true;
 			auto end = mousePos;
 
-			auto red = Point4f(1, 0, 0, 1);
+			auto red = RED;
 
 			shader.setMatrix("projectionMatrix", identity<4, float>());
 			shader.setMatrix("viewMatrix", identity<4, float>());
@@ -125,7 +150,48 @@ int main (int argc, char const *argv[])
 			Util::drawLine(mousePos, Point2f(mousePos.x, mouseStart.y, 0), red);
 			Util::drawLine(Point2f(mousePos.x, mouseStart.y, 0), mouseStart, red);
 		}
+
+		if (!window.mouse.getLmb() && wasLmb) {
+			wasLmb = false;
+			if ((mousePos - mouseStart).norm2() < 0.01) {
+				printf("clicked\n");
+				Math::Point2i a = map.get_index(mousePos + camera.pos -
+						Math::Point2f(-1, 1));
+				to_animate = animated_fill(map, a.x, a.y);
+				// auto [visited, upd] = animated_dijkstra(map, a.y, -a.x, 0, 0);
+				auto [visited, upd, p] = animated_A_star(map, a.x, a.y, 0, 0);
+				to_animate = visited;
+				update_order = upd;
+				path = p;
+				animate_inc = 0;
+				path_inc = 0;
+				sleep_timer = 10;
+			}
+			else {
+				printf("selection\n");
+			}
+		}
 		window.swapBuffers();
 	}
 	return 0;
 }
+
+/*
+	Tasks:
+		+ Make a chunk-based grid system
+		+ enable movement with wasd
+		- make buttons
+		- maybe implement faster 2D graphics?
+		- enable target place with rmb
+		- make some props: walls, buildings etc.
+		- try to implement D*Lite
+		- try to implement FibHeap
+		- test D*Lite, FibHeap, A*, BinaryHeap
+		- D* should be able to recompute path after finding an obstacle,
+			check how well it works
+		- find out how to share paths between troops
+		- optimize pathing for chunks, maybe check what pre-processing can be
+			done to see if chunk is traversable?
+		- implement troops movement
+		- start building the actual game
+*/

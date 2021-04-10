@@ -1,0 +1,9 @@
+{
+	"chunks": [
+		{"row": 0, "col": 0, "filename": "chunk_0_0.txt"},
+		{"row": 0, "col": 1, "filename": "chunk_0_1.txt"},
+		{"row": 1, "col": 0, "filename": "chunk_1_0.txt"},
+		{"row": 1, "col": 1, "filename": "chunk_1_1.txt"},
+		{"row": -1, "col": -1, "filename": "chunk_n1_n1.txt"}
+	]
+}
