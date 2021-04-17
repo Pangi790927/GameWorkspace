@@ -1,0 +1,109 @@
+A MMO RTS game.
+Map:
+	The map is made out of tiles.
+	Diffrent levels of elevation, 1, 2, 3 with transition tiles.
+			_________
+	_______/
+	Water tiles have only 1 elevation level.
+	Groups of tiles can have a resource that is needed.
+
+Resources:
+	Aluminium - Al - light structural resource.
+	Ground Resources - Cu, Si, P, K, C - circuits, motors, gunpowder ...
+	Oil - S, ... - plastics and others
+	H20 - Each town needs at least one. It is collected from rivers, lakes,
+		oceans
+	Uranium - Rare resource used to fuel outside of boundries expeditions
+	- GS, Oil can be stored and transfered while Al can't be stored or
+	transfered to other towns
+
+Units:
+	Are built from parts: wheels-tracks, body(light, medium, heavy), turrets(
+		turrets are special, they are built from a moving platform on which you
+		can put difrent guns: cannons-lasers-gatlings, balistic weapons-rockets,
+		utilitar: repair, transport, missile shield, camouflage ...)
+	Those parts will be broken as separate pieces.
+	Customizable armed vehicles: cars, tanks, boats, planes.
+	Fixed utility vehicles: transporters
+	Units are max 1 tile, boats can be larger.
+	There is a max unit count per town
+	Units have pre-computed hitboxes to ease computation in fights
+
+Towns:
+	Have 3 rings areas around them
+	Towns are harder to build in a manner that each player can only have a max
+		count of towns
+	First town must be built near a town
+
+Relations:
+	Aliance:
+		free trade(normal trade has a trade fee), free unit movement
+			and can use aliance gates
+	Vasal-Suzeran-Family:
+		- can control some troops of the vasal-family while they are offline
+		- can build troops with your resources at their facility while they are
+			offline or they grant access
+		- can build some fortification in vasal-family teritory
+		- vasals pay suzerans some resources for their protection
+		- while both are online vasals are protected by suzeran troops and
+			family protect each-other
+
+Buildings:
+	Player buildings:
+		Town Ring 1:
+			- Production area
+			- can build refineries, assamblers, magnetic roads
+			and Q buildings + F reactor
+			- there are some special expensive buildings:
+				- Quantum Center: QC, this is the town, it is build by an
+				Uranium Powered Quantum Center Assambler: UPQCA.
+				Will revert to a UPQCA if destroied storing the entire town to
+				be moved.
+				- Fusion Reactor: This basically holds the city alive, in a
+				siege destroying the FR will deactivate the city
+				- Quantum disruptor - stops other towns from beeing built in the
+				area
+				- Quantum Gate - links towns togheter
+				- Quantum Extension - another cart to UPQCA - used to extend a
+				town production area
+			- Production buildings:
+				- magnetic roads with carts - they move parts around
+				- refinaries: build plastic from petroleum, gunpowder, circuits,
+				motors, 3d printers for vehicle body and armor etc.
+				- assamblers: robot arms, welders, final assembly area(machines
+				are built on those)
+		Town Ring 2:
+			- Can construct airport, docs, storage and resource gathering here
+			- resource gatherers must be linked to a town
+			- can't construct production, and main(Q) buildings here
+			- can construct fortifications(forts, turrets, walls). Those can be
+			customized.
+			- need a builder to carry resources and build those buildings
+			- extern solar powered areas are ring 2 areas and resources need to
+			be carried to them
+		Town Ring 3:
+			- No buildings can be constructed here but all vehicles can walt to
+			here
+ 		Outside Rings:
+			- this area is outside any player town, only uranium powered
+			vehicles can walk here or vehicles assisted by uranium powered
+			vehicles
+			- A Mobile Uranium Quantum Gate - MUQG - can be used to build solar
+			extensions outside of main rings
+			- human anti-robots spown here
+		Production tiles:
+			----
+			|##|
+			|##|
+			----
+			* '-', '|' are roads for magnetic cart 
+			* '#' is the production area
+	Human Town:
+		- human buildings
+		- They give quests with which you make Q parts
+		- They also give heroes
+		- anti-robot factions spawn near them and they attack Player towns
+		- they give qparts caravans in exchange of raw qparts and those caravans
+			can be used to build small qparts extraction buildings. Those
+			buildings disapear after they give the player qparts.
+

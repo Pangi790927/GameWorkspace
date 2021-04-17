@@ -8,12 +8,15 @@ ifeq ($(OS),Windows_NT)
 else
 	NAME = test
 	CXX = g++
-	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -o $(NAME)
+	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -lXi -lfreetype -L../ImGui/imgui \
+			-limgui -o $(NAME)
 	RM = rm -rf
 	GLEW = 
 endif
 
-CXX_INCLUDE = -I../Window -I../Math4f -I../Shaders -I../Texture -I../Misc -I../Mesh
+CXX_INCLUDE = -I../Window -I../Math4f -I../Shaders -I../Texture -I../Misc \
+		-I../Mesh -I/usr/include/freetype2 -I/usr/include/libpng16 -I../Fonts \
+		-I../ImGui -I../ImGui/imgui
 
 all: clean $(GLEW)
 	$(CXX) -std=c++17 main.cpp $(GLEW) $(CXX_FLAGS) $(CXX_INCLUDE)

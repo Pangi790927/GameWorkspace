@@ -1,0 +1,10 @@
+
+newmtl wire_028149177
+Kd 0.207595 0.138513 0.055181
+Ns 256
+d 1
+illum 1
+Ka 0 0 0
+Ks 0 0 0
+map_Ka Textures/diffuse.jpg
+map_Kd Textures/diffuse.jpg

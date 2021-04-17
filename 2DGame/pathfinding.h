@@ -6,6 +6,82 @@
 #include "draw_utils.h"
 #include "game_map.h"
 
+/*
+Some ideas:
+
+1. New idea:
+	all tiles are the same, water or dirt
+	use clearance based pathing
+	0. generate a final formation
+	1. split selected units by groups, if they are too far away they separate
+	2. choose a path comander for each group
+	3. set speed as slowest unit for mini grup
+	5. for each group compute commander path
+	5.1. for each group compute travel order
+	6. per group move troops:
+		0. commander declares move intention: direction and position
+		-1. each troop tries to do it's queued action
+		1. each troop when done last action will try to move in the direction
+		of the commander + the direction to the desired flock position
+		normalized to group speed and with small negative or positive bonnus
+		if not in vecinity of desired location.
+		1.1 aditional check to see if can move backwards to achieve desired
+		effect
+		2. units are circles and take ownership of tiles bellow them when circle
+			intersects tile circle
+		3. if forward blocked by moving ally, pass update
+		4. if forward is blocked by stationary ally, tell him to path away from
+		you in the oposite direction of commander
+		5. if forward path blocked and commander is in back, wait
+		6. if forward path is blocked and commander is in front, path to
+		commander, at most n squares
+		7. if pathing to commander fails split from group and repath to
+		formation
+	7. for each unit not in final formation if close to objective path to
+	objective
+	8. else repath to formation
+	9. pathing is a state of the troop, as is the state of following
+	10. rotating is done by checking the rotation speed. Each troop has
+	x time in an update to do it's stuff for each paralel part. Turret and
+	wheels are one example of paralel parts. So wheels can turn and move forward
+	to move forward to a 
+	11. Paths should use regions if path is not in same or neghbour region
+
+
+Troops can be passed by troops, but should prefer not to.
+
+Troop groups should re-use the path computed by first troop and only on failure
+to follow should they recompute their own path.
+
+There are two types of troops:
+	* foot troops and
+	* heavy troops
+Foot troops have 3 path stages while heavy troops have only 2.
+The first stage is the foot stage, only for foot troops and in this stage the
+troop will do the following:
+	1. if there is a path to follow:
+		1. if can advance on path, advance on path, if advanced on heavy path
+			pop heavy node from stack, if advanced map path, pop
+		2. if can't advance on path because it is blocked by moving ally unit
+			wait
+		3. if can't advance on path because it is blocked by targetable enemy
+			attack enemy once
+		4. if can't advance for any other reason: recompute foot path
+			1. if recompute is still inside the two heavy tiles: curr and next
+				all ok or inside same heavy if target is in same tile
+			2. else: try to recompute heavy path(note this can happen also if
+				target is inside same heavy tile, because it means there was
+				no foot path otherwise)
+	2. else if there is a heavy path:
+		1. try to compute foot path as in 1.4 and if it fails note failure(
+			remember that for this step there is no path directly from heavy1
+			to heavy2) and try recompute heavy (optimization: if foot tile in
+			heavy tile is not accessible from current heavy tile, try dfs to see
+			if any heavy is accesible and if not fail heavy path)
+
+
+*/
+
 std::vector<Math::Point2i> animated_fill(GameMap &map, int i, int j) {
 	using key_t = Math::Point2i;
 	auto key_hash = [](const key_t& k) {

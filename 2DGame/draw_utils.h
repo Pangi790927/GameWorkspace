@@ -55,6 +55,17 @@ void draw_circle(int y, int x, float side = SIDE,
 				center + Point2f(sin(i + inc), cos(i + inc)) * radius, color);
 }
 
+void draw_circlef(int y, int x, float side = SIDE,
+		Math::Point4f color = DEFAULT_COLOR)
+{
+	using namespace Math;
+	using namespace Util;
+
+	Point2f center = point_at(y, x, side);
+	float radius = side / 2.;
+	drawCircle(center, radius, color);
+}
+
 void draw_cross(int y, int x, float side = SIDE,
 		Math::Point4f color = DEFAULT_COLOR)
 {
@@ -91,6 +102,21 @@ void draw_wall(int y, int x, float side = SIDE,
 	for (int i = 0; i <= line_cnt; i++)
 		drawLine(Point2f(0, -i*s) + left_up, Point2f(side, -i*s) + left_up,
 				color);
+}
+
+void draw_wallf(int y, int x, float s = SIDE,
+		Math::Point4f color = DEFAULT_COLOR)
+{
+	using namespace Math;
+	using namespace Util;
+
+	Point2f center = point_at(y, x, s);
+	Point2f left_up = center + Point2f(-1, 1) * s / 2;
+
+	drawTriangle(left_up, left_up + Point2f(s, -s),
+			left_up + Point2f(s, 0), color);
+	drawTriangle(left_up, left_up + Point2f(0, -s),
+			left_up + Point2f(s, -s), color);
 }
 
 

@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
 else
 	NAME = test
 	CXX = g++-7
-	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -o $(NAME)
+	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -lXi -o $(NAME)
 	RM = rm -rf
 	GLEW = 
 endif
